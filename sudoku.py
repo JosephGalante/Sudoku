@@ -21,10 +21,9 @@ class Sudoku(object):
             [0, 0, 3, 0, 0, 0, 0, 8, 7]
         ]
         self.nums = range(1, len(self.board) + 1)
-        self.new = []
 
         start_time = time.perf_counter()
-        poo = self.solve()
+        self.solve()
         stop_time = time.perf_counter()
 
         print(f'It took {stop_time - start_time} seconds to find this solution:')
