@@ -6,41 +6,55 @@ import sys
 class Sudoku(object):
 
     def __init__(self):
-
         # Initialize the board
         # Use 0 for empty squares in the board
         self.board = [
-            [6, 2, 8, 1, 9, 5, 7, 4, 3],
-            [4, 0, 0, 0, 0, 8, 0, 5, 0],
+            [6, 0, 8, 1, 9, 0, 7, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 5, 0],
             [0, 9, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 5, 0, 0, 3, 0, 2],
+            [9, 0, 0, 5, 0, 0, 0, 0, 2],
             [0, 0, 0, 0, 0, 0, 0, 0, 8],
-            [0, 1, 0, 6, 0, 0, 0, 9, 0],
-            [0, 0, 0, 0, 0, 7, 6, 0, 0],
-            [0, 6, 5, 0, 2, 4, 0, 0, 0],
-            [0, 0, 3, 0, 0, 0, 0, 8, 7]
+            [0, 0, 0, 0, 0, 0, 0, 9, 0],
+            [0, 0, 0, 0, 0, 0, 6, 0, 0],
+            [0, 0, 5, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0]
         ]
-        self.nums = range(1, len(self.board) + 1)
 
+        self.nums = range(1, len(self.board) + 1)
         start_time = time.perf_counter()
-        self.solve()
+        self.solve(0, 0)
         stop_time = time.perf_counter()
 
-        print(f'It took {stop_time - start_time} seconds to find this solution:')
+        print(f'It took {round(stop_time - start_time, 6)} seconds to find this solution:')
+
+    def solve(self, i, j):
+        i, j = self.next_coords(i, j)
+        if(i == -1):
+            return True
         
+        for num in self.nums:
+            if(self.is_temp_solution(i, j, num)):
+                self.board[i][j] = num
+                if(self.solve(i, j)):
+                    return True
+                self.board[i][j] = 0
+        return False
 
-    def solve(self):
+    def next_coords(self, row, col):
 
-        for i, row in enumerate(self.board):
-            for j, col in enumerate(row): 
-                if (self.board[i][j] == 0):
-                    for num in self.nums:
-                        if (self.is_temp_solution(i, j, num) is True):
-                            self.board[i][j] = num
-                            self.solve()
-                            self.board[i][j] = 0
-                    return
-        [print(row) for row in self.board]
+        # Finds next 0 in the given row
+        for x in range(row, 9):
+            for y in range(col, 9):
+                if self.board[x][y] == 0:
+                    return x, y
+
+        # Finds any open 0 in the sudoku board
+        for x in range(0, 9):
+            for y in range(0, 9):
+                if self.board[x][y] == 0:
+                    return x, y
+
+        return -1,-1
 
 
     # Returns True if the number is:
@@ -82,5 +96,5 @@ class Sudoku(object):
 
 if __name__ == '__main__':
     sudoku = Sudoku()
-    
+    sudoku.print_board()
     
