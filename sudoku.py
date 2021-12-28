@@ -2,6 +2,7 @@ import numpy as np
 import time
 from math import sqrt
 import sys
+from copy import deepcopy
 
 class Sudoku(object):
 
@@ -9,23 +10,32 @@ class Sudoku(object):
         # Initialize the board
         # Use 0 for empty squares in the board
         self.board = [
-            [6, 0, 8, 1, 9, 0, 7, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 5, 0],
-            [0, 9, 0, 0, 0, 0, 0, 0, 0],
-            [9, 0, 0, 5, 0, 0, 0, 0, 2],
-            [0, 0, 0, 0, 0, 0, 0, 0, 8],
-            [0, 0, 0, 0, 0, 0, 0, 9, 0],
-            [0, 0, 0, 0, 0, 0, 6, 0, 0],
-            [0, 0, 5, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0]
+            [0, 0, 0,    0, 0, 0,    0, 0, 0],
+            [0, 0, 0,    0, 0, 0,    0, 0, 0],
+            [0, 0, 0,    0, 0, 0,    0, 0, 0],
+
+            [0, 0, 0,    0, 0, 0,    0, 0, 0],
+            [3, 0, 0,    0, 0, 0,    1, 8, 9],
+            [0, 3, 0,    0, 0, 0,    0, 0, 0],
+
+            [0, 0, 0,    0, 0, 0,    0, 0, 0],
+            [0, 0, 0,    0, 0, 0,    0, 0, 0],
+            [0, 0, 0,    0, 0, 0,    0, 0, 0],
         ]
+        original = deepcopy(self.board)
 
-        self.nums = range(1, len(self.board) + 1)
-        start_time = time.perf_counter()
-        self.solve(0, 0)
-        stop_time = time.perf_counter()
+        if(self.is_valid()):
+            self.nums = range(1, len(self.board) + 1)
 
-        print(f'It took {round(stop_time - start_time, 6)} seconds to find this solution:')
+            #start_time = time.perf_counter()
+            self.solve(0, 0)
+            #stop_time = time.perf_counter()
+
+            if(self.board == original):
+                print('This puzzle does not contain a solution')
+            else:
+                #print(f'It took {round(stop_time - start_time, 6)} seconds to find this solution:')
+                self.print_board()
 
     def solve(self, i, j):
         i, j = self.next_coords(i, j)
@@ -41,19 +51,19 @@ class Sudoku(object):
         return False
 
     def next_coords(self, row, col):
-
         # Finds next 0 in the given row
-        for x in range(row, 9):
-            for y in range(col, 9):
+        for x in range(row, len(self.board)):
+            for y in range(col, len(self.board)):
                 if self.board[x][y] == 0:
                     return x, y
 
-        # Finds any open 0 in the sudoku board
-        for x in range(0, 9):
-            for y in range(0, 9):
+        # Finds first open 0 in the sudoku board after backtracking
+        for x in range(0, len(self.board)):
+            for y in range(0, len(self.board)):
                 if self.board[x][y] == 0:
                     return x, y
 
+        # Else, return invalid coordinates
         return -1,-1
 
 
@@ -86,7 +96,50 @@ class Sudoku(object):
                 if(num == self.board[i][j]):
                     return True
         return False
+        
+    def is_valid(self):
+        
+        # First check if columns are valid
+        for j, col in enumerate(zip(*self.board)):
+            temp = list(col)
+            for i in range(temp.count(0)):
+                temp.remove(0)
+            if(len(temp) != len(set(temp))):
+                print(f'Invalid Board: Error in column {j + 1}')
+                return False
 
+
+        # Then check if the rows are valid
+        for j, row in enumerate(self.board):
+            temp = list(row)
+            for i in range(row.count(0)):
+                temp.remove(0)
+            if(len(temp) != len(set(temp))):                
+                print(f'Invalid Board: Error in row {j + 1}')
+                return False
+
+        # Finally, check if the 3x3 grids are valid
+        grid_check = (range(0, len(self.board), int(sqrt(len(self.board)))))
+        root = int(sqrt(len(self.board)))
+
+        for start_row in grid_check:
+            for start_col in grid_check:
+                grid = []
+                for i in range(start_row, start_row + root):
+                    for j in range(start_col, start_col + root):
+                        grid.append(self.board[i][j])
+                temp = list(grid)
+                for k in range(temp.count(0)):
+                    temp.remove(0)
+                if(len(temp) != len(set(temp))):
+                    print(f'Invalid Board: Error in local grid starting at row {start_row + 1}, column {start_col + 1}')
+                    return False
+                            
+
+
+        # If all tests successfully pass,
+        # then the board is valid, return True
+        return True
 
     # Print the Sudoku board
     def print_board(self):
@@ -96,5 +149,13 @@ class Sudoku(object):
 
 if __name__ == '__main__':
     sudoku = Sudoku()
-    sudoku.print_board()
+    #sudoku.print_board()
+
+    # temp = [0,0,5,6,0,2,5,7,0, 4]
+
+    # for i in range(temp.count(0)):
+    #     temp.remove(0)
+    # print(temp)
+
+    # print(len(temp) == len(set(temp)))
     
