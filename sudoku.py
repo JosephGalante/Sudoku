@@ -1,4 +1,3 @@
-import numpy as np
 from time import perf_counter
 from math import sqrt
 from copy import deepcopy
