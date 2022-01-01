@@ -1,7 +1,6 @@
 import numpy as np
-import time
+from time import perf_counter
 from math import sqrt
-import sys
 from copy import deepcopy
 
 class Sudoku(object):
@@ -27,9 +26,9 @@ class Sudoku(object):
         if(self.is_valid()):
             self.nums = range(1, len(self.board) + 1)
 
-            #start_time = time.perf_counter()
+            #start_time = perf_counter()
             self.solve(0, 0)
-            #stop_time = time.perf_counter()
+            #stop_time = perf_counter()
 
             if(self.board == original):
                 print('This puzzle does not contain a solution')
